@@ -25,7 +25,7 @@ class _ConvLoRA(BaseLoRAModule[ConvType]):
         self.in_conv: ConvType = in_conv
         self.out_conv: ConvType = out_conv
         self.dropout = nn.Dropout(dropout)
-        self.problem_module = False
+        self.problem_module = problem_module
 
     def forward(self, x: Tensor) -> Tensor:
         if self.problem_module:
