@@ -26,9 +26,9 @@ class _ConvLoRA(BaseLoRAModule[ConvType]):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: Tensor) -> Tensor:
-        x = self.in_conv(x)
+        x = self.in_conv(x.transpose(1,2))
         x = self.dropout(x)
-        return self.out_conv(x)
+        return self.out_conv(x).transpose(1,2)
 
     @torch.no_grad()
     def merge(self, module: ConvType, inplace: bool = False) -> ConvType:  # type: ignore
