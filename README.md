@@ -15,7 +15,7 @@ pip install lora-pytorch
 
 From source:
 ```bash
-pip install "lora-pytorch @ git+ssh://git@github.com/fkodom/lora-pytorch.git"
+pip install "lora-pytorch @ git+ssh://git@github.com/jlparki/lora-pytorch-bnet-adapted"
 ```
 
 For contributors:
