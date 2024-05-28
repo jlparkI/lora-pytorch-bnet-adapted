@@ -19,10 +19,6 @@ from typing import (
 import torch
 from torch import Tensor, nn
 
-from sequence_models.convolutional import MaskedConv1d, MaskedCausalConv1d
-            lora_module_cls = MaskedCausalConv1dLoRAModule
-        elif isinstance(module, MaskedConv1d):
-            lora_module_cls = MaskedConv1dLoRAModule
 
 from lora_pytorch.modules.attention import MultiheadAttentionLoRAModule
 from lora_pytorch.modules.base import BaseLoRAModule
@@ -107,11 +103,7 @@ class LoRA(nn.Module, Generic[ModuleType]):
         lora_module_cls: Union[
             Type[Conv1dLoRAModule], Type[Conv2dLoRAModule], Type[Conv3dLoRAModule]
         ]
-        if isinstance(module, MaskedCausalConv1d):
-            lora_module_cls = MaskedCausalConv1dLoRAModule
-        elif isinstance(module, MaskedConv1d):
-            lora_module_cls = MaskedConv1dLoRAModule
-        elif isinstance(module, nn.Conv1d):
+        if isinstance(module, nn.Conv1d):
             lora_module_cls = Conv1dLoRAModule
         elif isinstance(module, nn.Conv2d):
             lora_module_cls = Conv2dLoRAModule

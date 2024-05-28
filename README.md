@@ -6,29 +6,6 @@ A simple but robust implementation of [LoRA (Low-Rank Adaptation)](https://arxiv
 * Fully tested ✔️
 
 
-## Install
-
-PyPI:
-```bash
-pip install lora-pytorch
-```
-
-From source:
-```bash
-pip install "lora-pytorch @ git+ssh://git@github.com/jlparki/lora-pytorch-bnet-adapted"
-```
-
-For contributors:
-```bash
-# Clone repository
-gh repo clone fkodom/lora-pytorch
-# Install all dev dependencies (tests etc.)
-cd lora-pytorch
-pip install -e ".[all]"
-# Setup pre-commit hooks
-pre-commit install
-```
-
 
 ## Usage
 
