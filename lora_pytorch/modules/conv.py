@@ -26,7 +26,7 @@ class _ConvLoRA(BaseLoRAModule[ConvType]):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: Tensor) -> Tensor:
-        x = self.in_conv(x.transpose(1,2))
+        x = self.in_conv(x)
         x = self.dropout(x)
         return self.out_conv(x).transpose(1,2)
 
