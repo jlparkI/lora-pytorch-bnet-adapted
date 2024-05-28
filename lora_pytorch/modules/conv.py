@@ -19,16 +19,23 @@ class _ConvLoRA(BaseLoRAModule[ConvType]):
         in_conv: ConvType,
         out_conv: ConvType,
         dropout: float = 0.0,
+        problem_module: bool = False
     ):
         super().__init__()
         self.in_conv: ConvType = in_conv
         self.out_conv: ConvType = out_conv
         self.dropout = nn.Dropout(dropout)
+        self.problem_module = False
 
     def forward(self, x: Tensor) -> Tensor:
-        x = self.in_conv(x)
-        x = self.dropout(x)
-        return self.out_conv(x).transpose(1,2)
+        if self.problem_module:
+            x = self.in_conv(x.transpose(1,2))
+            x = self.dropout(x)
+            return self.out_conv(x).transpose(1,2)
+        else:
+            x = self.in_conv(x)
+            x = self.dropout(x)
+            return self.out_conv(x)
 
     @torch.no_grad()
     def merge(self, module: ConvType, inplace: bool = False) -> ConvType:  # type: ignore
@@ -74,6 +81,7 @@ class Conv1dLoRAModule(_ConvLoRA[nn.Conv1d]):
         dropout: float = 0.0,
         device: Optional[torch.device] = None,
         dtype: Optional[torch.dtype] = None,
+        problem_module: bool = False
     ):
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -102,7 +110,7 @@ class Conv1dLoRAModule(_ConvLoRA[nn.Conv1d]):
         out_conv = nn.Conv1d(
             rank, out_channels, kernel_size=1, bias=bias, device=device, dtype=dtype
         )
-        super().__init__(in_conv=in_conv, out_conv=out_conv, dropout=dropout)
+        super().__init__(in_conv=in_conv, out_conv=out_conv, dropout=dropout, problem_module = problem_module)
 
         # NOTE: The original LoRA paper recommends multiplying the output of 'in_proj'
         # by (alpha / rank).  This adds more computation to the forward pass, and it's
@@ -141,6 +149,7 @@ class Conv2dLoRAModule(_ConvLoRA[nn.Conv2d]):
         dropout: float = 0.0,
         device: Optional[torch.device] = None,
         dtype: Optional[torch.dtype] = None,
+        problem_module: bool = False
     ):
         # NOTE: Only include bias in 'out_conv', since it's normally applied
         # after the convolution.  When merging LoRA weights, we can't have a
@@ -160,7 +169,7 @@ class Conv2dLoRAModule(_ConvLoRA[nn.Conv2d]):
         out_conv = nn.Conv2d(
             rank, out_channels, kernel_size=1, bias=bias, device=device, dtype=dtype
         )
-        super().__init__(in_conv=in_conv, out_conv=out_conv, dropout=dropout)
+        super().__init__(in_conv=in_conv, out_conv=out_conv, dropout=dropout, problem_module = problem_module)
 
         # NOTE: The original LoRA paper recommends multiplying the output of 'in_proj'
         # by (alpha / rank).  This adds more computation to the forward pass, and it's
@@ -192,6 +201,7 @@ class Conv3dLoRAModule(_ConvLoRA[nn.Conv3d]):
         dropout: float = 0.0,
         device: Optional[torch.device] = None,
         dtype: Optional[torch.dtype] = None,
+        problem_module: bool = False
     ):
         # NOTE: Only include bias in 'out_conv', since it's normally applied
         # after the convolution.  When merging LoRA weights, we can't have a
@@ -211,7 +221,7 @@ class Conv3dLoRAModule(_ConvLoRA[nn.Conv3d]):
         out_conv = nn.Conv3d(
             rank, out_channels, kernel_size=1, bias=bias, device=device, dtype=dtype
         )
-        super().__init__(in_conv=in_conv, out_conv=out_conv, dropout=dropout)
+        super().__init__(in_conv=in_conv, out_conv=out_conv, dropout=dropout, problem_module = problem_module)
 
         # NOTE: The original LoRA paper recommends multiplying the output of 'in_proj'
         # by (alpha / rank).  This adds more computation to the forward pass, and it's

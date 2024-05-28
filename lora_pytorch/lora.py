@@ -30,6 +30,7 @@ from lora_pytorch.modules.conv import (
 )
 from lora_pytorch.modules.embedding import EmbeddingLoRAModule
 from lora_pytorch.modules.linear import LinearLoRAModule
+from sequence_models.convolutional import MaskedConv1d, MaskedCausalConv1d
 
 ModuleType = TypeVar("ModuleType", bound=nn.Module)
 
@@ -45,6 +46,7 @@ class LoRA(nn.Module, Generic[ModuleType]):
         self.module = module.eval()
         self.lora_module = lora_module
         self.enabled = enabled and lora_module is not None
+        self.problem_module = False
 
         if not enabled:
             self.disable_lora()
@@ -103,6 +105,15 @@ class LoRA(nn.Module, Generic[ModuleType]):
         lora_module_cls: Union[
             Type[Conv1dLoRAModule], Type[Conv2dLoRAModule], Type[Conv3dLoRAModule]
         ]
+
+        # Added as a quick and dirty hack to deal with ByteNet subclass which transposes
+        # input and output.
+        problem_module = False
+        if isinstance(module, MaskedConv1d):
+            problem_module = True
+        if isinstance(module, MaskedCausalConv1d):
+            problem_module = True
+
         if isinstance(module, nn.Conv1d):
             lora_module_cls = Conv1dLoRAModule
         elif isinstance(module, nn.Conv2d):
@@ -123,6 +134,7 @@ class LoRA(nn.Module, Generic[ModuleType]):
             groups=module.groups,
             device=device,
             dtype=dtype,
+            problem_module = problem_module
         )
 
         return LoRA(module, lora_module)
